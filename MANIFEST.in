@@ -1,5 +1,5 @@
 include MANIFEST.in
-include unity-lens-wikipedia.service
-include wikipedia.lens
+include unity-lens-nx.service
+include nx.lens
 include src/*
 include media/*
