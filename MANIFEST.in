@@ -1,0 +1,5 @@
+include MANIFEST.in
+include unity-lens-wikipedia.service
+include wikipedia.lens
+include src/*
+include media/*

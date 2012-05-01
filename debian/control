@@ -1,0 +1,17 @@
+Source: unity-lens-nx
+Section: gnome
+Priority: optional
+Maintainer: Sean Dague <sean@dague.net>
+Build-Depends: debhelper (>= 8), python, python-distutils-extra
+Standards-Version: 3.9.2
+Homepage: http://launchpad.net/unity-lens-nx
+
+Package: unity-lens-nx
+Architecture: all
+Depends: ${misc:Depends},
+         ${python:Depends},
+         gir1.2-unity-5.0,
+         gir1.2-dee-1.0,
+Description: Unity NX Lens
+ A plugin to search NX configs in the Dash.
+
