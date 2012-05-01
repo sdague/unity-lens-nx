@@ -34,9 +34,13 @@ class Daemon:
         # The path for the Lens *must* also match the one in our .lens file
         self._lens = Unity.Lens.new ("/net/launchpad/lens/nx", "nx")
         self._scope = Unity.Scope.new ("/net/launchpad/lens/nx/main")
+        self._scope.search_in_global = True
+
         self._lens.props.search_hint = "Search Nx"
         self._lens.props.visible = True;
-        self._lens.props.search_in_global = False;
+        self._lens.props.search_in_global = True;
+        self._lens.props.sources_display_name = ("NX Configs")
+
 
         self._lens.add_local_scope (self._scope);
         self._scope.connect("search-changed", self.on_search_changed)
@@ -44,7 +48,7 @@ class Daemon:
 
         # Populate categories
         cats = []
-        cats.append (Unity.Category.new ("Articles",
+        cats.append (Unity.Category.new ("NX Sessions",
                                          Gio.ThemedIcon.new(svg_dir+"group-installed.svg"),
                                          Unity.CategoryRenderer.VERTICAL_TILE))
         self._lens.props.categories = cats
@@ -58,25 +62,25 @@ class Daemon:
 
 
     def on_search_changed (self, scope, search, search_type, *_):
-        if search_type is Unity.SearchType.DEFAULT:
-            search_string = search.props.search_string.strip()
-            print "Search changed to \"%s\"" % search_string
-            model = search.props.results_model
-            model.clear ()
-            self.update_results_model(model, search_string)
-            search.set_reply_hint ("no-results-hint", GLib.Variant.new_string("Sorry, there are no articles that match your search."))
+#        if search_type is Unity.SearchType.DEFAULT:
+        search_string = search.props.search_string.strip()
+        print "Search changed to \"%s\"" % search_string
+        model = search.props.results_model
+        model.clear ()
+        self.update_results_model(model, search_string)
+        search.set_reply_hint ("no-results-hint", GLib.Variant.new_string("Sorry, there are no articles that match your search."))
         search.finished ()
 
     def update_results_model (self, model, search):
         if search == '':
             search = str(datetime.datetime.now().strftime("%B %d"))
-        model.append("Gallifrey",
-                     "http://upload.wikimedia.org/nx/commons/6/63/Nx-logo.png",
+        model.append("file:///home/sdague/.nx/config/gallifrey.nxs",
+                     "file:///usr/NX/share/icons/48x48/nxclient-icon.png",
                      0,
                      "text/html",
-                     "gallifrey"
+                     "Gallifrey",
                      "NX Config",
-                     "file://home/sdague/.nx/config/gallifrey.nx"
+                     "file:///home/sdague/.nx/config/gallifrey.nxs"
                      )
     #     for article in self.nx_query(search):
     #         model.append("%s/wiki/%s" % (self.wiki, article),
