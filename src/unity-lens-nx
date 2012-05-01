@@ -17,6 +17,7 @@
 
 import sys
 import os
+import glob
 from gi.repository import GLib, GObject, Gio
 from gi.repository import Dee
 from gi.repository import Unity
@@ -55,53 +56,36 @@ class Daemon:
 
         locale.setlocale(locale.LC_MESSAGES, '')
         loc = locale.getlocale(locale.LC_MESSAGES)[0].split("_")[0]
-        self.wiki = "http://%s.nx.org" % (loc)
 
         self._lens.export ();
         self._scope.export ();
 
 
     def on_search_changed (self, scope, search, search_type, *_):
-#        if search_type is Unity.SearchType.DEFAULT:
+        #        if search_type is Unity.SearchType.DEFAULT:
         search_string = search.props.search_string.strip()
         print "Search changed to \"%s\"" % search_string
         model = search.props.results_model
-        model.clear ()
+        model.clear()
         self.update_results_model(model, search_string)
         search.set_reply_hint ("no-results-hint", GLib.Variant.new_string("Sorry, there are no articles that match your search."))
-        search.finished ()
+        search.finished()
 
     def update_results_model (self, model, search):
         if search == '':
-            search = str(datetime.datetime.now().strftime("%B %d"))
-        model.append("file:///home/sdague/.nx/config/gallifrey.nxs",
-                     "file:///usr/NX/share/icons/48x48/nxclient-icon.png",
-                     0,
-                     "text/html",
-                     "Gallifrey",
-                     "NX Config",
-                     "file:///home/sdague/.nx/config/gallifrey.nxs"
-                     )
-    #     for article in self.nx_query(search):
-    #         model.append("%s/wiki/%s" % (self.wiki, article),
-    #                     "http://upload.wikimedia.org/nx/commons/6/63/Nx-logo.png",
-    #                     0,
-    #                     "text/html",
-    #                     article,
-    #                     "Nx Article",
-    #                     "%s/wiki/%s" % (self.wiki, article))
+            return
 
+        files = glob.glob("%s/.nx/config/*%s*.nxs" % (os.environ["HOME"], search))
 
-    # def nx_query(self,search):
-    #     try:
-    #         search = search.replace(" ", "|")
-    #         url = ("%s/w/api.php?action=opensearch&limit=25&format=json&search=%s" % (self.wiki, search))
-    #         results = simplejson.loads(urllib2.urlopen(url).read())
-    #         print "Searching Nx"
-    #         return results[1]
-    #     except (IOError, KeyError, urllib2.URLError, urllib2.HTTPError, simplejson.JSONDecodeError):
-    #         print "Error : Unable to search Nx"
-    #         return []
+        for config in files:
+            model.append("file://%s" % config,
+                         "file:///usr/NX/share/icons/48x48/nxclient-icon.png",
+                         0,
+                         "text/html",
+                         os.path.splitext(os.path.basename(config))[0],
+                         "NX Config",
+                         "file://%s" % config,
+                         )
 
 if __name__ == "__main__":
     session_bus_connection = Gio.bus_get_sync (Gio.BusType.SESSION, None)
